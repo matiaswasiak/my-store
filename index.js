@@ -1,4 +1,5 @@
 const express = require('express');
+const { faker } = require('@faker-js/faker');
 const app = express();
 const port = 3000;
 
@@ -10,19 +11,22 @@ app.get('/nueva-ruta', (req, res) => {
   res.send('Nueva ruta');
 });
 
-app.get('/productos', (req, res) => {
-  res.json([
-    {
-      id: 1,
-      name: 'Producto 1',
-      price: 1000,
-    },
-    {
-      id: 2,
-      name: 'Producto 2',
-      price: 2000,
-    },
-  ]);
+app.get('/products', (req, res) => {
+  const products = [];
+  const { size } = req.query;
+  const limit = size || 10;
+  for (let i = 0; i < limit; i++) {
+    products.push({
+      name: faker.commerce.productName(),
+      price: parseInt(faker.commerce.price(), 10),
+      image: faker.image.urlLoremFlickr(),
+    });
+  }
+  res.json(products);
+});
+
+app.get('/products/filter', (req, res) => {
+  res.send('Soy un filter');
 });
 
 app.get('/products/:id', (req, res) => {
@@ -32,6 +36,15 @@ app.get('/products/:id', (req, res) => {
     name: 'Producto 1',
     price: 1000,
   });
+});
+
+app.get('/users', (req, res) => {
+  const { limit, offset } = req.query;
+  if (limit && offset) {
+    res.json({ limit, offset });
+  } else {
+    res.send('No hay parametros');
+  }
 });
 
 app.get('/categories/:categoryId/products/:productId', (req, res) => {
